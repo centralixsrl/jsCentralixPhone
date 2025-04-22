@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>jsCentralixPhone</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    </head>
+<body>
+
+<div class="container">
+
+    <div class="row mt-5">
+        <div class="col">
+            Stato Socket : <div id="statusSocket"><span class="badge text-bg-warning">Disconnesso</span></div>
+        </div>
+        <div class="col">
+            Stato Telefono : <div id="statusAccount"><span class="badge text-bg-warning">Disconnesso</span></div>
+        </div>
+        <div class="col text-end">
+            <button class="btn btn-danger" id="btnDisconnect" style="display: none;">Disconnetti</button>
+            <button class="btn btn-success" id="btnConnect" style="display: none;">Connetti</button>
+        </div>
+        <div class="col text-end">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Impostazioni">Impostazioni</button>
+        </div>
+    </div>
+
+</div>
+
+<div class="container mt-5">
+
+    <div class="row">
+
+        <div class="col-6">
+            <div class="row" id="outbound">
+                <div class="col-6">
+                    <input type="number" class="form-control" id="numero" name="numero" placeholder="Numero da chiamare" value="333333333">
+                </div>
+                <div class="col-6">
+                    <button class="btn btn-primary btn-sm" id="call" onclick="call()">Chiama</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="row bg-light p-3 rounded" id="inbound" style="display: none;">
+                <div class="col-6">
+                    <h5>Chiamata in Arrivo da </h5>
+                    <p id="callerID"></p>
+                </div>
+                <div class="col-6">
+                    <button class="btn btn-primary btn-sm" id="answer">Rispondi</button>
+                    <button class="btn btn-danger btn-sm" id="hangupCall" style="display: none;">Aggancia</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div id="calls">
+
+        <div class="row d-none" id="callrow_">
+            <div class="col-12 bg-light rounded p-3 mt-2 mb-2">
+                <div class="row">
+                    <div class="col-4">
+                        <h4 id="callerid_">333333333</h4>
+                    </div>
+                    <div class="col-4">
+                        <div class="col-6 btn-group" role="group">
+                            <button class="btn btn-primary btn-sm" id="mute">Muta</button>
+                            <button class="btn btn-secondary btn-sm" style="display:none;" id="unmute">Unmuta</button>
+                            <button class="btn btn-dark btn-sm" id="onhold">In Attesa</button>
+                            <button class="btn btn-secondary btn-sm" style="display:none;" id="unhold">Riprendi</button>
+                            <button class="btn btn-info btn-sm" id="transfer">Trasferisci</button>
+                        </div>
+                    </div>
+                    <div class="col-4 text-end">
+                        <button class="btn btn-primary btn-sm" id="answer_">Rispondi</button>
+                        <button class="btn btn-danger btn-sm" id="hangup_">Aggancia</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row d-none" id="callwor_">
+            <div class="col-12 bg-light rounded p-3 mt-2 mb-2">
+                <div class="row">
+                    <div class="col-4">
+                        <h4 id="callerid_">333333333</h4>
+                        <p id="callerfail_">Occupato</p>
+                    </div>
+                    <div class="col-4">
+                        <div class="col-6 btn-group" role="group">
+                            <button class="btn btn-primary btn-sm" id="mute">Muta</button>
+                            <button class="btn btn-secondary btn-sm" style="display:none;" id="unmute">Unmuta</button>
+                            <button class="btn btn-dark btn-sm" id="onhold">In Attesa</button>
+                            <button class="btn btn-secondary btn-sm" style="display:none;" id="unhold">Riprendi</button>
+                            <button class="btn btn-info btn-sm" id="transfer">Trasferisci</button>
+                        </div>
+                    </div>
+                    <div class="col-4 text-end">
+                        <button class="btn btn-danger btn-sm" id="hangup_">Aggancia</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+
+</div>
+
+
+<div class="modal" tabindex="-1" id="Impostazioni">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Impostazioni</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="mb-3">
+                    <label for="domain" class="col-form-label">Dominio</label>
+                    <input type="text" class="form-control" value="" id="domain" name="domain">
+                </div>
+
+                <div class="mb-3">
+                    <label for="username" class="col-form-label">Username</label>
+                    <input type="text" class="form-control" value="" id="username" name="username">
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="col-form-label">Password</label>
+                    <input type="password" class="form-control" value="" id="password" name="password">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                <button type="button" id="btnSalvaImpostazioni" class="btn btn-primary">Salva Informazioni</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" type="text/javascript"></script>
+<script src="lib/jssip-3.10.0.js" type="text/javascript"></script>
+<script src="lib/jsCentralixPhone.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+        let socketStatus,accountStatus = 0;
+
+        /** # ESEMPIO DI MESSAGGI BRODCAST
+         * Questo canale ti permette di girare gli eventi a qualsiasi finestra dello stesso dominio che si aggancia a questo canale.
+         *
+         * Esempio : channel.postMessage({event: 'ringing'});
+         */
+        const channel = new BroadcastChannel('canale_comunicazione');
+
+        function connect() {
+
+            if(sessionStorage.getItem("domain") == ""){
+                alert("Devi impostare un server.");
+                return;
+            }
+            if(sessionStorage.getItem("username") == ""){
+                alert("Devi impostare il tuo username.");
+                return;
+            }
+            if(sessionStorage.getItem("password") == ""){
+                alert("Devi impostare la password del tuo interno.");
+                return;
+            }
+
+            let domain = sessionStorage.getItem("domain");
+            let username = sessionStorage.getItem("username");
+            let password = sessionStorage.getItem("password");
+
+            if(domain == location.host || domain == "127.0.0.1"){
+                domain = location.host;
+            }
+
+            jsCentralixPhone.setParameters(domain,8089,username,password);
+            jsCentralixPhone.connect();
+
+
+
+            /** # CONNECTED
+             * Questo evento viene ricevuto il socket ha stabilito la connessione al centralino.
+             */
+            jsCentralixPhone.on('connected', function (e) {
+                socketStatus = 1;
+                document.getElementById("statusSocket").innerHTML = '<span class="badge text-bg-success">Connesso</span>';
+
+            });
+
+            /** # DISCONNECTED
+             * Questo evento viene ricevuto quando il socket si è disconnesso dal centralino.
+             */
+            jsCentralixPhone.on('disconnected', function (e) {
+                socketStatus = 0;
+                document.getElementById("statusSocket").innerHTML = '<span class="badge text-bg-warning">Disconnesso</span>';
+            });
+
+            /** # REGISTERED
+             * Questo evento viene ricevuto quando l'interno si è registrato al centralino.
+             */
+            jsCentralixPhone.on('registered', function (e) {
+                document.getElementById("statusAccount").innerHTML = '<span class="badge text-bg-success">Connesso</span>';
+                document.getElementById("btnDisconnect").style.display = "block";
+                document.getElementById("btnConnect").style.display = "none";
+                accountStatus = 1;
+            });
+
+            /** # UNREGISTERED
+             * Questo evento viene ricevuto quando l'interno si è disconnesso dal centralino.
+             */
+            jsCentralixPhone.on('unregistered', function (e) {
+                console.log("DEREGISTRATO", e);
+                document.getElementById("statusAccount").innerHTML = '<span class="badge text-bg-warning">Disconnesso</span>';
+                document.getElementById("btnDisconnect").style.display = "none";
+                document.getElementById("btnConnect").style.display = "block";
+
+                accountStatus = 0;
+            });
+
+            /** # REGISTRATION FAILED
+             * Questo evento viene ricevuto quando il centralino non puà autenticare l'interno.
+             */
+            jsCentralixPhone.on('registrationFailed', function (e) {
+                console.log("registrationFailed", e);
+                document.getElementById("statusAccount").innerHTML = '<span class="badge text-bg-warning">Registrazione Fallita</span>';
+                document.getElementById("btnDisconnect").style.display = "none";
+                accountStatus = 0;
+            });
+
+
+            /** # NEW RTC SESSION
+             * Questo evento viene ricevuto quando c'è una chiamata in Ingresso o in Uscita.
+             */
+            jsCentralixPhone.on('newRTCSession', (event) => {
+
+                document.getElementById("call").disabled = true;
+                
+                console.log('newRTCSession',event);
+
+                if(event.direction === 'incoming'){
+                    //document.getElementById("callerID").innerText = event.callerid;
+                    //document.getElementById("inbound").style.display = "block";
+                    //document.getElementById("outbound").style.display = "none";
+
+                    document.getElementById("calls").innerHTML += `
+                    <div class="row" id="callrow_${event.sessionID}">
+                        <div class="col-12 bg-light rounded p-3 mt-2 mb-2">
+                            <div class="row">
+                                <div class="col-4">
+                                    <h6>Chiama in arrivo da :</h6>
+                                    <h4 id="callerid_${event.sessionID}">${event.callerID} ${event.callerName}</h4>
+                                </div>
+                                <div class="col-4">
+                                    <div class="col-6 btn-group" role="group">
+                                        <button class="btn btn-primary btn-sm"      id="onmute_${event.sessionID}"                                                     onclick="javascript:jsCentralixPhone.mute('${event.sessionID}')">Muta</button>
+                                        <button class="btn btn-secondary btn-sm"                                        style="display:none;" id="unmute_${event.sessionID}"     onclick="javascript:jsCentralixPhone.mute('${event.sessionID}')">Unmuta</button>
+                                        <button class="btn btn-dark btn-sm"         id="onhold_${event.sessionID}"                                                     onclick="javascript:jsCentralixPhone.hold('${event.sessionID}')">In Attesa</button>
+                                        <button class="btn btn-secondary btn-sm"                                        style="display:none;" id="unhold_${event.sessionID}"     onclick="javascript:jsCentralixPhone.hold('${event.sessionID}')">Riprendi</button>
+                                        <button class="btn btn-info btn-sm"         id="transfer_${event.sessionID}"                                                   onclick="transfer('${event.sessionID}')">Trasferisci</button>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <button class="btn btn-primary btn-sm" id="answer_${event.sessionID}"                                                              onclick="javascript:jsCentralixPhone.answer('${event.sessionID}')">Rispondi</button>
+                                    <button class="btn btn-danger btn-sm" id="hangup_${event.sessionID}"                                                               onclick="javascript:jsCentralixPhone.hangup('${event.sessionID}')">Aggancia</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+
+
+
+                } else {
+
+                    document.getElementById("calls").innerHTML += `
+                    <div class="row" id="callrow_${event.sessionID}">
+                        <div class="col-12 bg-light rounded p-3 mt-2 mb-2">
+                            <div class="row">
+                                <div class="col-4">
+                                    <h4 id="callerid_${event.sessionID}">${event.callerID}</h4>
+                                    <p id="callerfail_${event.sessionID}"></p>
+                                </div>
+                                <div class="col-4">
+                                    <div class="col-6 btn-group" role="group">
+                                        <button class="btn btn-primary btn-sm"                         id="onmute_${event.sessionID}" onclick="javascript:jsCentralixPhone.mute('${event.sessionID}')">Muta</button>
+                                        <button class="btn btn-secondary btn-sm" style="display:none;" id="unmute_${event.sessionID}" onclick="javascript:jsCentralixPhone.mute('${event.sessionID}')">Unmuta
+                                        </button>
+                                        <button class="btn btn-dark btn-sm"                            id="onhold_${event.sessionID}" onclick="javascript:jsCentralixPhone.hold('${event.sessionID}')">In Attesa</button>
+                                        <button class="btn btn-secondary btn-sm" style="display:none;" id="unhold_${event.sessionID}" onclick="javascript:jsCentralixPhone.hold('${event.sessionID}')">Riprendi
+                                        </button>
+                                        <button class="btn btn-info btn-sm" id="transfer"  onclick="transfer('${event.sessionID}')">Trasferisci</button>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <button class="btn btn-danger btn-sm" id="hangup_${event.sessionID}"  onclick="javascript:jsCentralixPhone.hangup('${event.sessionID}')">Aggancia</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+
+
+
+                }
+
+
+            });
+
+            /** # FAILED
+             * Questo evento viene ricevuto quando si verifica un errore sulla chiamata.
+             */
+            jsCentralixPhone.on('failed', (event) => {
+                console.log("failed",event);
+                document.getElementById("call").disabled = false;
+                document.getElementById("callrow_"+event.sessionID).remove();
+            });
+
+            /** # ON ANWSER
+             * Questo evento viene ricevuto quando unachiamata viene risposta (inbound/outbound)
+             */
+            jsCentralixPhone.on('onAnwser', (event) => {
+                console.log('onAnwser', event);
+            });
+
+            /** # ON HANGUP
+             * Questo evento viene ricevuto quando una chiamata viene agganciata
+             */
+            jsCentralixPhone.on('onHangup', (event) => {
+                console.log('onHangup', event);
+                document.getElementById("call").disabled = false;
+                document.getElementById("callrow_"+event.sessionID).remove();
+            });
+
+            /** # ON CONFIRMED
+             * Questo evento viene ricevuto quando una chiamata viene correttamente agganciata sui due canali.
+             */
+            jsCentralixPhone.on('onConfirmed', (event) => {
+                console.log('onConfirmed', event);
+                if(event.originator === 'remote') {
+                    document.getElementById("answer_" + event.sessionID).style.display = 'none';
+                }
+            });
+
+            /** # ON TYPING
+             * Questo evento viene ricevuto quando una chiamata è in fase di composizione da parte della centrale.
+             */
+            jsCentralixPhone.on('onTyping', (event) => {
+                console.log("Invio chiamata...");
+            });
+
+            /** # ON RINGING
+             * Questo evento viene ricevuto quando il numero del chiamato squilla.
+             */
+            jsCentralixPhone.on('onRinging', (event) => {
+                console.log("Sta squillando..." , event);
+
+                // Esempio di invio del messaggio Brodcast
+                channel.postMessage({event: 'ringing'});
+            });
+
+            /** # ON HOLD
+             * Questo evento viene ricevuto quando una chiamata viene messa in attesa o ripresa.
+             */
+            jsCentralixPhone.on('onHold', (event) => {
+
+                console.log('onHold', event);
+                if(event.isOnHold){
+                    document.getElementById("onhold_"+event.sessionID).style.display = 'none';
+                    document.getElementById("unhold_"+event.sessionID).style.display = 'block';
+                } else {
+                    document.getElementById("onhold_"+event.sessionID).style.display = 'block';
+                    document.getElementById("unhold_"+event.sessionID).style.display = 'none';
+                }
+            });
+
+            /** # ON MUTE
+             * Questo evento viene ricevuto quando una chiamata viene messa in Mute
+             */
+            jsCentralixPhone.on('onMute', (event) => {
+                console.log('onMute', event);
+                if(event.isMuted){
+                    document.getElementById("onmute_"+event.sessionID).style.display = 'none';
+                    document.getElementById("unmute_"+event.sessionID).style.display = 'block';
+                } else {
+                    document.getElementById("onmute_"+event.sessionID).style.display = 'block';
+                    document.getElementById("unmute_"+event.sessionID).style.display = 'none';
+                }
+            });
+
+            /** # ASSIST TRASNFER
+             * Questo evento viene ricevuto quando una chiamata viene trasferita ad un altro numero.
+             */
+            jsCentralixPhone.on('assistTransfer', (event) => {
+                console.log('assistTransfer', event);
+            });
+
+        }
+
+
+    function disconnect(){
+        jsCentralixPhone.unregister();
+        document.getElementById("btnConnect").style.display = "block";
+    }
+
+
+
+
+        document.getElementById("btnSalvaImpostazioni").addEventListener("click", () => {
+
+            sessionStorage.setItem("domain", document.getElementById("domain").value);
+            sessionStorage.setItem("username", document.getElementById("username").value);
+            sessionStorage.setItem("password", document.getElementById("password").value);
+            $('#Impostazioni').modal('hide');
+            connect();
+        });
+
+        if(sessionStorage.getItem("domain") != ""){
+            document.getElementById("domain").value = sessionStorage.getItem("domain");
+        }
+        if(sessionStorage.getItem("username") != ""){
+            document.getElementById("username").value = sessionStorage.getItem("username");
+        }
+        if(sessionStorage.getItem("password") != ""){
+            document.getElementById("password").value = sessionStorage.getItem("password");
+        }
+
+        if(sessionStorage.getItem("domain") != "" && sessionStorage.getItem("username") != "" && sessionStorage.getItem("password") != "") {
+            document.getElementById("btnConnect").style.display = "block";
+        }
+
+        document.getElementById("btnDisconnect").addEventListener("click", () => {
+            disconnect();
+        });
+
+        document.getElementById("btnConnect").addEventListener("click", () => {
+            connect();
+        });
+
+
+        function call() {
+            var callerid = document.getElementById("numero").value;
+            jsCentralixPhone.dial(callerid);
+        }
+
+        function transfer(sessionID) {
+
+            let ext = prompt("Digitare l'interno a cui si vuole trasferire la chiamata");
+
+            if (ext != null) {
+                jsCentralixPhone.assistTransfer(sessionID, ext);
+            }
+
+        }
+
+
+
+
+</script>
+</body>
+</html>
